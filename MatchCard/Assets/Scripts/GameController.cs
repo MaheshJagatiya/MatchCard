@@ -24,6 +24,9 @@ public class GameController : MonoBehaviour
     [SerializeField] private int layoutIndex = -1;
     private GameState _state = GameState.None;
 
+    private readonly Queue<Card> pendingCardList = new Queue<Card>(4);
+    private bool CardCheckingRunning;
+
     public void Start()
     {      
         if (layoutIndex < 0) layoutIndex = config.defaultLayoutIndex;
@@ -31,12 +34,17 @@ public class GameController : MonoBehaviour
         NewGame(layoutIndex);
         _state = GameState.Playing;
     }
+    /// <summary>
+    /// set all value when game start as per layout count value
+    /// </summary>
+   
     public void NewGame(int layoutIdx)
     {
         //Not Go out of Range and pick layout from config
         var layout = config.layouts[Mathf.Clamp(layoutIdx, 0, config.layouts.Length - 1)];
         var ids = BuildShuffledIds(layout);
-        cardBoard.LayoutBuild(layout, config, ids);     
+        cardBoard.LayoutBuild(layout, config, ids);
+        AddActionOnCard();
         _state = GameState.Playing;
     }
     /// <summary>
@@ -60,5 +68,18 @@ public class GameController : MonoBehaviour
         }
         list.RandomShuffleCards();
         return list;
+    }
+    private void AddActionOnCard()
+    {
+        foreach (var c in cardBoard.Cards)
+            c.CardClicked += OnCardClicked;
+    }
+    /// <summary>
+    /// Add card in queue and check if card is faceup then not to do any action
+    /// </summary> 
+    private void OnCardClicked(Card card)
+    {
+        if (!card.Reveal()) return;
+        pendingCardList.Enqueue(card);        
     }
 }

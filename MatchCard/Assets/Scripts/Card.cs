@@ -1,6 +1,9 @@
+﻿using System;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
-public class Card : MonoBehaviour
+public class Card : MonoBehaviour, IPointerClickHandler
 {
     /// <summary>
     /// Card selection logic and flip Animation
@@ -14,7 +17,9 @@ public class Card : MonoBehaviour
     public bool IsFaceUp { get; private set; }
 
     private bool isAnimating;
-    private float halfFlipSeconds = 1.0f;//Flip time 
+    private float halfFlipSeconds = 0.08f;//Flip time 
+   
+    public event Action<Card> CardClicked;
     public void CardInit(int id, Sprite front, Sprite back)
     {     
         Id = id; 
@@ -26,5 +31,75 @@ public class Card : MonoBehaviour
         frontCard.gameObject.SetActive(false);
         backCard.gameObject.SetActive(true);
         transform.localScale = Vector3.one; 
+    }
+    /// <summary>
+    /// Add event when card is clicked 
+    /// so call needed changes by call different function
+    /// </summary>
+  
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        CardClicked?.Invoke(this);
+    }
+    /// <summary>
+    /// if card is not faceup then then go for animation
+    /// </summary>
+    
+    public bool Reveal()
+    {
+        if (IsFaceUp) return false;
+        StartCoroutine(FlipCardAnimation(true));
+        return true;
+    }
+    /// <summary>
+    /// If Card is not matched then do animation and hide again 
+    /// </summary>
+    public void HideIfUnmatched()
+    {
+        if (!IsMatched && IsFaceUp && !isAnimating)
+            StartCoroutine(FlipCardAnimation(false));
+    }
+    public void MarkMatched()
+    {
+        IsMatched = true;      
+    }
+    /// <summary>
+    /// Flip Card Animation as per tie peramter
+    /// Set card peramter attribute
+    /// </summary>
+    
+    private IEnumerator FlipCardAnimation(bool showFront)
+    {
+        isAnimating = true;       
+        var rt = (RectTransform)transform;
+        
+        yield return ScaleYPosition(rt, 1f, 0f, halfFlipSeconds);
+        frontCard.gameObject.SetActive(showFront);
+        backCard.gameObject.SetActive(!showFront);
+        IsFaceUp = showFront;
+       
+        yield return ScaleYPosition(rt, 0f, 1f, halfFlipSeconds);
+        isAnimating = false;
+    }
+    /// <summary>
+    /// This coroutine smoothly animates a UI element’s Y scale from a to b over seconds
+    /// </summary>
+    /// <returns></returns>
+    private static IEnumerator ScaleYPosition(RectTransform rt, float startScalePos, float endScalePos, float seconds)
+    {
+        float el = 0f;
+        while (el < seconds)
+        {
+            el += Time.unscaledDeltaTime;
+            float k = Mathf.Clamp01(el / seconds);
+            var s = rt.localScale; 
+            s.y = Mathf.Lerp(startScalePos, endScalePos, k);
+            rt.localScale = s;
+            yield return null;
+
+        }
+        var s2 = rt.localScale; 
+        s2.y = endScalePos; 
+        rt.localScale = s2;
     }
 }

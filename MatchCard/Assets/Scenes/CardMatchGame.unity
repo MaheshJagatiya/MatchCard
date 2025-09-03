@@ -412,10 +412,10 @@ RectTransform:
   m_Father: {fileID: 699980966}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 300, y: 0}
-  m_SizeDelta: {x: 1000, y: 800}
+  m_AnchorMin: {x: 0.39422917, y: 0.116281256}
+  m_AnchorMax: {x: 0.91954184, y: 0.89325005}
+  m_AnchoredPosition: {x: -1, y: -4.5}
+  m_SizeDelta: {x: -8, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1447853266
 MonoBehaviour:
@@ -545,3 +545,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   config: {fileID: 11400000, guid: 554b21953759b2c41985aeb62fabe34e, type: 2}
   cardBoard: {fileID: 1447853268}
+  layoutIndex: -1
