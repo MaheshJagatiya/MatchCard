@@ -20,6 +20,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
     private float halfFlipSeconds = 0.08f;//Flip time 
    
     public event Action<Card> CardClicked;
+    public bool IsCardInteractable => !isAnimating && !IsMatched;
     public void CardInit(int id, Sprite front, Sprite back)
     {     
         Id = id; 
@@ -39,7 +40,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
   
     public void OnPointerClick(PointerEventData eventData)
     {
-        CardClicked?.Invoke(this);
+        if (IsCardInteractable) CardClicked?.Invoke(this);
     }
     /// <summary>
     /// if card is not faceup then then go for animation
@@ -47,7 +48,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
     
     public bool Reveal()
     {
-        if (IsFaceUp) return false;
+        if (!IsCardInteractable || IsFaceUp) return false;
         StartCoroutine(FlipCardAnimation(true));
         return true;
     }

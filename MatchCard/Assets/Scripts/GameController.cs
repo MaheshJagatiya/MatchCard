@@ -24,8 +24,10 @@ public class GameController : MonoBehaviour
     [SerializeField] private int layoutIndex = -1;
     private GameState _state = GameState.None;
 
+    private int matchCartCount, totalCardCount;
+
     private readonly Queue<Card> pendingCardList = new Queue<Card>(4);
-    private bool CardCheckingRunning;
+    private bool IsCardCheckingRunning;
 
     public void Start()
     {      
@@ -40,10 +42,15 @@ public class GameController : MonoBehaviour
    
     public void NewGame(int layoutIdx)
     {
-        //Not Go out of Range and pick layout from config
-        var layout = config.layouts[Mathf.Clamp(layoutIdx, 0, config.layouts.Length - 1)];
+        pendingCardList.Clear();
+        IsCardCheckingRunning = false;
+
+        matchCartCount = 0;
+      
+        var layout = config.layouts[Mathf.Clamp(layoutIdx, 0, config.layouts.Length - 1)]; //Not Go out of Range and pick layout from config
         var ids = BuildShuffledIds(layout);
         cardBoard.LayoutBuild(layout, config, ids);
+        totalCardCount = layout.x * layout.y;
         AddActionOnCard();
         _state = GameState.Playing;
     }
@@ -53,8 +60,7 @@ public class GameController : MonoBehaviour
     /// Add total/2 idds 2 time in list 
     /// then send rondom shuffle
     /// </summary>
-    /// <param name="layout"></param>
-    /// <returns></returns>
+    
     private List<int> BuildShuffledIds(Vector2Int layout)
     {
         int total = layout.x * layout.y; //Total card count
@@ -80,6 +86,52 @@ public class GameController : MonoBehaviour
     private void OnCardClicked(Card card)
     {
         if (!card.Reveal()) return;
-        pendingCardList.Enqueue(card);        
+        pendingCardList.Enqueue(card);
+
+        if (!IsCardCheckingRunning) 
+            StartCoroutine(CheckingForMatchCardEvent());
+    }
+    private IEnumerator CheckingForMatchCardEvent()
+    {     
+        IsCardCheckingRunning = true;
+        while (pendingCardList.Count >= 2)
+        {
+            var firstCard = DequeueValidCard();
+            var SecondCard = DequeueValidCard();
+            if (firstCard == null || firstCard == null) break;
+            yield return new WaitForSeconds(0.25f);
+            if (firstCard.Id == SecondCard.Id && 
+               !firstCard.IsMatched && !SecondCard.IsMatched)
+            {
+                firstCard.MarkMatched();
+                SecondCard.MarkMatched();
+                matchCartCount += 2;
+                Debug.Log("Matched Succesfully");
+            }
+            else
+            {             
+                yield return new WaitForSeconds(0.35f);
+                firstCard.HideIfUnmatched(); 
+                SecondCard.HideIfUnmatched();
+                Debug.Log("Not Matched Succesfully");
+
+            }
+            if (matchCartCount >= totalCardCount)
+            {             
+                _state = GameState.GameOver;
+                Debug.Log("All Card Faceup");
+                yield break;
+            }         
+        }
+        IsCardCheckingRunning = false;
+    }
+    private Card DequeueValidCard()
+    {
+        while (pendingCardList.Count > 0)
+        {
+            var localCard = pendingCardList.Dequeue();
+            if (localCard != null && localCard.IsFaceUp && !localCard.IsMatched) return localCard;
+        }
+        return null;
     }
 }
