@@ -19,4 +19,8 @@ public class GameConfig : ScriptableObject
     public AudioClip soundMatch;
     public AudioClip soundMismatch;
     public AudioClip soundGameOver;
+
+    [Header("Scoring")]
+    public int matchScore = 100;
+    public int mismatchPenalty = 10;
 }

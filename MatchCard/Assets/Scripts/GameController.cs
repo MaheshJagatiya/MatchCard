@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem.HID;
 
 public class GameController : MonoBehaviour
 {
@@ -21,11 +22,14 @@ public class GameController : MonoBehaviour
     [SerializeField] private GameConfig config;
     [SerializeField] private CardBoardGenerator cardBoard;
     [SerializeField] private MusicController soundManager;
+    [SerializeField] private HudUiManager hudUi;
     [Header("Layout")]
     [SerializeField] private int layoutIndex = -1;
     private GameState _state = GameState.None;
 
     private int matchCartCount, totalCardCount;
+    private int playerScore, playerComboScore;
+    private float elapsedTime;
 
     private readonly Queue<Card> pendingCardList = new Queue<Card>(4);
     private bool IsCardCheckingRunning;
@@ -37,23 +41,41 @@ public class GameController : MonoBehaviour
         NewGame(layoutIndex);
         _state = GameState.Playing;
     }
+    private void Update()
+    {
+        if (_state != GameState.Playing) return;
+        elapsedTime += Time.deltaTime;
+        hudUi.UpdateTimer(elapsedTime);
+    }
     /// <summary>
     /// set all value when game start as per layout count value
     /// </summary>
-   
+
     public void NewGame(int layoutIdx)
     {
         pendingCardList.Clear();
         IsCardCheckingRunning = false;
 
         matchCartCount = 0;
-      
+        totalCardCount = 0;
+        playerScore = 0;
+        playerComboScore = 0;
+        hudUi.Awake();
+        UpdateScore();
+        
         var layout = config.layouts[Mathf.Clamp(layoutIdx, 0, config.layouts.Length - 1)]; //Not Go out of Range and pick layout from config
         var ids = BuildShuffledIds(layout);
         cardBoard.LayoutBuild(layout, config, ids);
         totalCardCount = layout.x * layout.y;
         AddActionOnCard();
-        _state = GameState.Playing;
+        _state = GameState.Playing;   
+    }
+    /// <summary>
+    /// Update Score in UI
+    /// </summary>
+    private void UpdateScore()
+    {
+        hudUi.UpdateScore(playerScore, playerComboScore);
     }
     /// <summary>
     /// Add total card number
@@ -93,6 +115,12 @@ public class GameController : MonoBehaviour
             StartCoroutine(CheckingForMatchCardEvent());
         
     }
+    /// <summary>
+    /// Match both card are same if same then Update UI
+    /// if Card are not Match then flip back card and reduce score
+    /// if total card open then game over
+    /// </summary>
+ 
     private IEnumerator CheckingForMatchCardEvent()
     {
         IsCardCheckingRunning = true;
@@ -111,25 +139,32 @@ public class GameController : MonoBehaviour
                 soundManager.PlayMatch();
                 matchCartCount += 2;
                 Debug.Log("Matched Succesfully");
+                playerComboScore++;             
+                playerScore += config.matchScore;             
+                UpdateScore();
             }
             else
-            {             
+            {
+                soundManager.PlayMismatch();
                 yield return new WaitForSeconds(0.35f);
                 firstCard.HideIfUnmatched(); 
                 SecondCard.HideIfUnmatched();
-                soundManager.PlayMismatch();
+               
                 Debug.Log("Not Matched Succesfully");
+                playerScore = Mathf.Max(0, playerScore - config.mismatchPenalty);
+                UpdateScore();
 
             }
             if (matchCartCount >= totalCardCount)
-            {             
-                _state = GameState.GameOver;
-                Debug.Log("All Card Faceup");
+            {
                 soundManager.PlayGameOver();
+                _state = GameState.GameOver;
+                Debug.Log("All Card Faceup");             
+                hudUi.ShowGameOver(playerScore,elapsedTime);
                 yield break;
             }         
         }
-        IsCardCheckingRunning = false;
+        IsCardCheckingRunning = false;      
     }
     private Card DequeueValidCard()
     {
@@ -140,4 +175,8 @@ public class GameController : MonoBehaviour
         }
         return null;
     }
+    /// <summary>
+    /// Start New game in reload button
+    /// </summary>
+    public void OnNewGameButton() => NewGame(layoutIndex);
 }
