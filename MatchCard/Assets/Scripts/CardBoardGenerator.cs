@@ -12,7 +12,7 @@ public class CardBoardGenerator : MonoBehaviour
     [SerializeField] private RectTransform boardArea;
     [SerializeField] private Card cardPrefab;
     [SerializeField] private GridLayoutGroup grid;
-    private readonly List<Card> _cards = new List<Card>(32);
+    private readonly List<Card> _cards = new List<Card>(42);
     public IReadOnlyList<Card> Cards => _cards;
 
     private void Awake()
