@@ -6,7 +6,7 @@ using UnityEngine.InputSystem.HID;
 public class GameController : MonoBehaviour
 {
     /// <summary>
-    /// Game Controll by config file a
+    /// Game Controll by config file 
     /// Refrence of different Game Module
     /// </summary>
     public enum GameState
@@ -23,6 +23,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private CardBoardGenerator cardBoard;
     [SerializeField] private MusicController soundManager;
     [SerializeField] private HudUiManager hudUi;
+    [SerializeField] private LayoutSelector layOutManage;
     [Header("Layout")]
     [SerializeField] private int layoutIndex = -1;
     private GameState _state = GameState.None;
@@ -38,6 +39,7 @@ public class GameController : MonoBehaviour
     {      
         if (layoutIndex < 0) layoutIndex = config.defaultLayoutIndex;
         soundManager.InitMusic(config);
+        layOutManage.InitLayoutDropDownSet(config,this);
         NewGame(layoutIndex);
         _state = GameState.Playing;
     }
@@ -60,6 +62,7 @@ public class GameController : MonoBehaviour
         totalCardCount = 0;
         playerScore = 0;
         playerComboScore = 0;
+        elapsedTime = 0;
         hudUi.Awake();
         UpdateScore();
         
@@ -179,4 +182,12 @@ public class GameController : MonoBehaviour
     /// Start New game in reload button
     /// </summary>
     public void OnNewGameButton() => NewGame(layoutIndex);
+    /// <summary>
+    /// Change Layout event
+    /// </summary>
+    public void OnChangeLayout(int newIndex)
+    {
+        layoutIndex = newIndex;
+        NewGame(layoutIndex);
+    }
 }
