@@ -92,8 +92,10 @@ public class GameController : MonoBehaviour
             StartCoroutine(CheckingForMatchCardEvent());
     }
     private IEnumerator CheckingForMatchCardEvent()
-    {     
+    {
         IsCardCheckingRunning = true;
+        yield return new WaitForSeconds(0.3f);
+        
         while (pendingCardList.Count >= 2)
         {
             var firstCard = DequeueValidCard();
