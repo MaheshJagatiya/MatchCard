@@ -13,4 +13,10 @@ public class GameConfig : ScriptableObject
     [Header("Sprites")]
     public Sprite backSprite;
     public List<Sprite> frontSprites;
+
+    [Header("SoundClip")]
+    public AudioClip soundFlip;
+    public AudioClip soundMatch;
+    public AudioClip soundMismatch;
+    public AudioClip soundGameOver;
 }

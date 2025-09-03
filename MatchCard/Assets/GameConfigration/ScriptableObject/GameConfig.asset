@@ -41,3 +41,7 @@ MonoBehaviour:
   - {fileID: 7157561037332017152, guid: 0f3e1154f0ac0434b88f9d13daf8c8c7, type: 3}
   - {fileID: 4164744761163438241, guid: eb3d830fedd29fc4a9c39ddc9289ee1c, type: 3}
   - {fileID: -5750353039905602045, guid: 44aeca14893472f469371c1629af5698, type: 3}
+  soundFlip: {fileID: 8300000, guid: 79ab70fa4634c0f498ea6903e87e6c3e, type: 3}
+  soundMatch: {fileID: 8300000, guid: a270b0ee1e4ded245a3a4082c2859f43, type: 3}
+  soundMismatch: {fileID: 8300000, guid: 79ab70fa4634c0f498ea6903e87e6c3e, type: 3}
+  soundGameOver: {fileID: 8300000, guid: 79ab70fa4634c0f498ea6903e87e6c3e, type: 3}

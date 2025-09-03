@@ -20,6 +20,7 @@ public class GameController : MonoBehaviour
     [Header("Scene References")]
     [SerializeField] private GameConfig config;
     [SerializeField] private CardBoardGenerator cardBoard;
+    [SerializeField] private MusicController soundManager;
     [Header("Layout")]
     [SerializeField] private int layoutIndex = -1;
     private GameState _state = GameState.None;
@@ -32,7 +33,7 @@ public class GameController : MonoBehaviour
     public void Start()
     {      
         if (layoutIndex < 0) layoutIndex = config.defaultLayoutIndex;
-       
+        soundManager.InitMusic(config);
         NewGame(layoutIndex);
         _state = GameState.Playing;
     }
@@ -87,15 +88,15 @@ public class GameController : MonoBehaviour
     {
         if (!card.Reveal()) return;
         pendingCardList.Enqueue(card);
-
-        if (!IsCardCheckingRunning) 
+        soundManager.PlayFlip();
+        if (!IsCardCheckingRunning)        
             StartCoroutine(CheckingForMatchCardEvent());
+        
     }
     private IEnumerator CheckingForMatchCardEvent()
     {
         IsCardCheckingRunning = true;
-        yield return new WaitForSeconds(0.3f);
-        
+        yield return new WaitForSeconds(0.3f);       
         while (pendingCardList.Count >= 2)
         {
             var firstCard = DequeueValidCard();
@@ -107,6 +108,7 @@ public class GameController : MonoBehaviour
             {
                 firstCard.MarkMatched();
                 SecondCard.MarkMatched();
+                soundManager.PlayMatch();
                 matchCartCount += 2;
                 Debug.Log("Matched Succesfully");
             }
@@ -115,6 +117,7 @@ public class GameController : MonoBehaviour
                 yield return new WaitForSeconds(0.35f);
                 firstCard.HideIfUnmatched(); 
                 SecondCard.HideIfUnmatched();
+                soundManager.PlayMismatch();
                 Debug.Log("Not Matched Succesfully");
 
             }
@@ -122,6 +125,7 @@ public class GameController : MonoBehaviour
             {             
                 _state = GameState.GameOver;
                 Debug.Log("All Card Faceup");
+                soundManager.PlayGameOver();
                 yield break;
             }         
         }
