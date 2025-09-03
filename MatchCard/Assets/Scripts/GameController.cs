@@ -131,13 +131,13 @@ public class GameController : MonoBehaviour
     private IEnumerator CheckingForMatchCardEvent()
     {
         IsCardCheckingRunning = true;
-        yield return new WaitForSeconds(0.3f);       
+        yield return new WaitForSeconds(0.2f);       
         while (pendingCardList.Count >= 2)
         {
             var firstCard = DequeueValidCard();
             var SecondCard = DequeueValidCard();
             if (firstCard == null || firstCard == null) break;
-            yield return new WaitForSeconds(0.25f);
+            yield return new WaitForSeconds(0.1f);
             if (firstCard.Id == SecondCard.Id && 
                !firstCard.IsMatched && !SecondCard.IsMatched)
             {
@@ -153,7 +153,7 @@ public class GameController : MonoBehaviour
             else
             {
                 soundManager.PlayMismatch();
-                yield return new WaitForSeconds(0.35f);
+                yield return new WaitForSeconds(0.2f);
                 firstCard.HideIfUnmatched(); 
                 SecondCard.HideIfUnmatched();              
                // Debug.Log("Not Matched Succesfully");
