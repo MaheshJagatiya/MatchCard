@@ -17,7 +17,7 @@ MonoBehaviour:
   - {x: 2, y: 3}
   - {x: 4, y: 4}
   - {x: 5, y: 6}
-  defaultLayoutIndex: 1
+  defaultLayoutIndex: 2
   spacing: {x: 8, y: 8}
   backSprite: {fileID: 21300000, guid: 99fcf450f83a3704ca295e7e4dfb27dc, type: 3}
   frontSprites:
@@ -27,7 +27,6 @@ MonoBehaviour:
   - {fileID: -4178046375966092550, guid: e2eb9e1cdc028aa4cb4dc7ee5ce054ff, type: 3}
   - {fileID: 3465286685962602723, guid: 25c1c24601e67eb48b3dac5be28d526c, type: 3}
   - {fileID: 7028616704906629411, guid: bedfc59c3fbe41a48a65bb15ba3306bc, type: 3}
-  - {fileID: 8288426215254106694, guid: 59865dab0cf4efa4680537e9982d4228, type: 3}
   - {fileID: 4113829005332862926, guid: 92d9322a666437c4fad17dd19b4ec1cd, type: 3}
   - {fileID: -5099292496197868168, guid: 49b62d018ba093a44a8c8da1d824c6f3, type: 3}
   - {fileID: -2966200626249415253, guid: 7a29188e380d9974590b018a40e59943, type: 3}
@@ -41,9 +40,9 @@ MonoBehaviour:
   - {fileID: 7157561037332017152, guid: 0f3e1154f0ac0434b88f9d13daf8c8c7, type: 3}
   - {fileID: 4164744761163438241, guid: eb3d830fedd29fc4a9c39ddc9289ee1c, type: 3}
   - {fileID: -5750353039905602045, guid: 44aeca14893472f469371c1629af5698, type: 3}
-  soundFlip: {fileID: 8300000, guid: 79ab70fa4634c0f498ea6903e87e6c3e, type: 3}
+  soundFlip: {fileID: 8300000, guid: a050ee58730dc5549896324db1973f04, type: 3}
   soundMatch: {fileID: 8300000, guid: a270b0ee1e4ded245a3a4082c2859f43, type: 3}
   soundMismatch: {fileID: 8300000, guid: 79ab70fa4634c0f498ea6903e87e6c3e, type: 3}
-  soundGameOver: {fileID: 8300000, guid: 79ab70fa4634c0f498ea6903e87e6c3e, type: 3}
+  soundGameOver: {fileID: 8300000, guid: 94982da7dcea2d14a9283990a08cbf21, type: 3}
   matchScore: 100
   mismatchPenalty: 10

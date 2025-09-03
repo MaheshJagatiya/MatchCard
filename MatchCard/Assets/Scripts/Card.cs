@@ -103,4 +103,13 @@ public class Card : MonoBehaviour, IPointerClickHandler
         s2.y = endScalePos; 
         rt.localScale = s2;
     }
+    public void ApplyResumeState(bool matched, bool faceUp)
+    {
+        IsMatched = matched;
+        IsFaceUp = faceUp;
+        frontCard.gameObject.SetActive(IsFaceUp);
+        backCard.gameObject.SetActive(!IsFaceUp);
+        gameObject.SetActive(!IsMatched ||
+        IsFaceUp); 
+    }
 }

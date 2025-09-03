@@ -40,7 +40,10 @@ public class GameController : MonoBehaviour
         if (layoutIndex < 0) layoutIndex = config.defaultLayoutIndex;
         soundManager.InitMusic(config);
         layOutManage.InitLayoutDropDownSet(config,this);
-        NewGame(layoutIndex);
+        if (SaveSystem.TryLoad(out var snap))
+            ResumeFromSnapshot(snap);
+        else
+            NewGame(layoutIndex);
         _state = GameState.Playing;
     }
     private void Update()
@@ -55,6 +58,7 @@ public class GameController : MonoBehaviour
 
     public void NewGame(int layoutIdx)
     {
+        SaveSystem.Clear();
         pendingCardList.Clear();
         IsCardCheckingRunning = false;
 
@@ -116,7 +120,7 @@ public class GameController : MonoBehaviour
         soundManager.PlayFlip();
         if (!IsCardCheckingRunning)        
             StartCoroutine(CheckingForMatchCardEvent());
-        
+        AutoSave();
     }
     /// <summary>
     /// Match both card are same if same then Update UI
@@ -141,7 +145,7 @@ public class GameController : MonoBehaviour
                 SecondCard.MarkMatched();
                 soundManager.PlayMatch();
                 matchCartCount += 2;
-                Debug.Log("Matched Succesfully");
+               // Debug.Log("Matched Succesfully");
                 playerComboScore++;             
                 playerScore += config.matchScore;             
                 UpdateScore();
@@ -151,9 +155,8 @@ public class GameController : MonoBehaviour
                 soundManager.PlayMismatch();
                 yield return new WaitForSeconds(0.35f);
                 firstCard.HideIfUnmatched(); 
-                SecondCard.HideIfUnmatched();
-               
-                Debug.Log("Not Matched Succesfully");
+                SecondCard.HideIfUnmatched();              
+               // Debug.Log("Not Matched Succesfully");
                 playerScore = Mathf.Max(0, playerScore - config.mismatchPenalty);
                 UpdateScore();
 
@@ -162,10 +165,12 @@ public class GameController : MonoBehaviour
             {
                 soundManager.PlayGameOver();
                 _state = GameState.GameOver;
-                Debug.Log("All Card Faceup");             
+              //  Debug.Log("All Card Faceup");             
                 hudUi.ShowGameOver(playerScore,elapsedTime);
+                AutoSave();
                 yield break;
-            }         
+            }
+            AutoSave();
         }
         IsCardCheckingRunning = false;      
     }
@@ -189,5 +194,72 @@ public class GameController : MonoBehaviour
     {
         layoutIndex = newIndex;
         NewGame(layoutIndex);
+    }
+
+
+    /// <summary>
+    /// Auto save current state of game
+    /// </summary>
+    private void AutoSave()
+    {
+        var layout = config.layouts[layoutIndex];
+        int total = layout.x * layout.y;
+        var snap = new SaveSnapshot
+        {
+            rows = layout.x,
+            cols = layout.y,
+            shuffledIds = new int[total],
+            matched = new bool[total],
+            faceUp = new bool[total],
+            score = playerScore,
+            combo = playerComboScore,
+            elapsed = elapsedTime
+        };
+       
+        for (int i = 0; i < total; i++)
+        {
+            var c = (Card)cardBoard.Cards[i];
+            snap.shuffledIds[i] = c.Id;
+            snap.matched[i] = c.IsMatched;
+            snap.faceUp[i] = c.IsFaceUp;
+        }
+        SaveSystem.Save(snap);
+    }
+    /// <summary>
+    /// resume game from prevous state 
+    /// </summary>
+   
+    private void ResumeFromSnapshot(SaveSnapshot s)
+    {
+        layoutIndex = FindLayoutIndex(new Vector2Int(s.rows, s.cols));
+        var layout = new Vector2Int(s.rows, s.cols);
+        cardBoard.LayoutBuild(layout, config, new List<int>(s.shuffledIds));
+        AddActionOnCard();
+        int total = s.rows * s.cols;
+        for (int i = 0; i < total; i++)
+        {
+            var c = (Card)cardBoard.Cards[i];
+            c.ApplyResumeState(s.matched[i], s.faceUp[i]);
+            if (s.matched[i]) matchCartCount++;
+        }
+        playerScore = s.score;
+        playerComboScore = s.combo;
+        elapsedTime = s.elapsed;
+        totalCardCount = total;
+        hudUi.UpdateScore(playerScore, playerComboScore);
+    }
+    private int FindLayoutIndex(Vector2Int layout)
+    {
+        for (int i = 0; i < config.layouts.Length; i++)
+            if (config.layouts[i] == layout) return i;
+        return config.defaultLayoutIndex;
+    }
+    private void OnApplicationPause(bool pause)
+    {
+        if (pause) AutoSave();
+    }
+    private void OnApplicationQuit()
+    {
+        AutoSave();
     }
 }
