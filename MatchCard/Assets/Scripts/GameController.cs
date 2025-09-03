@@ -232,6 +232,7 @@ public class GameController : MonoBehaviour
     private void ResumeFromSnapshot(SaveSnapshot s)
     {
         layoutIndex = FindLayoutIndex(new Vector2Int(s.rows, s.cols));
+      
         var layout = new Vector2Int(s.rows, s.cols);
         cardBoard.LayoutBuild(layout, config, new List<int>(s.shuffledIds));
         AddActionOnCard();
@@ -247,6 +248,7 @@ public class GameController : MonoBehaviour
         elapsedTime = s.elapsed;
         totalCardCount = total;
         hudUi.UpdateScore(playerScore, playerComboScore);
+        layOutManage.SetSaveLayoutIndex(layoutIndex);
     }
     private int FindLayoutIndex(Vector2Int layout)
     {

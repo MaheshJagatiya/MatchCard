@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 public class LayoutSelector : MonoBehaviour
 {
-    [SerializeField] private Dropdown dropdown;
+     public Dropdown dropdown;
      private GameConfig config;
      private GameController gameController;
 
@@ -24,5 +24,9 @@ public class LayoutSelector : MonoBehaviour
         dropdown.value = config.defaultLayoutIndex;
         dropdown.onValueChanged.AddListener(gameController.OnChangeLayout);
 
+    }
+    public void SetSaveLayoutIndex(int layIndex)
+    {
+        dropdown.value = layIndex;
     }
 }

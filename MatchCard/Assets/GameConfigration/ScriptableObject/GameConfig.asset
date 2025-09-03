@@ -17,6 +17,7 @@ MonoBehaviour:
   - {x: 2, y: 3}
   - {x: 4, y: 4}
   - {x: 5, y: 6}
+  - {x: 6, y: 6}
   defaultLayoutIndex: 2
   spacing: {x: 8, y: 8}
   backSprite: {fileID: 21300000, guid: 99fcf450f83a3704ca295e7e4dfb27dc, type: 3}
